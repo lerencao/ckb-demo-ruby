@@ -1,13 +1,19 @@
 require_relative 'api'
 require_relative 'utils'
 require_relative 'blake2b'
+require_relative 'tx/out_point'
+require_relative 'tx/input'
+require_relative 'tx/output'
+require_relative 'tx/script'
+require_relative 'tx/transaction'
 
 module Ckb
   class AlwaysSuccessWallet
     attr_reader :api
 
-    def initialize(api)
+    def initialize(api, code_hash = '0x0000000000000000000000000000000000000000000000000000000000000001')
       @api = api
+      @code_hash = code_hash
     end
 
     # @param target_lock [Ckb::Script]
@@ -61,7 +67,7 @@ module Ckb
       end
 
       tx = Transaction.new(
-        version: 0,
+        version: '0',
         deps: [],
         inputs: i.inputs,
         outputs: outputs
@@ -106,7 +112,7 @@ module Ckb
 
     def lock_script
       Script.new(
-        code_hash: '0x0000000000000000000000000000000000000000000000000000000000000001',
+        code_hash: @code_hash,
         args: []
       )
     end
@@ -133,10 +139,7 @@ module Ckb
       inputs = []
       get_unspent_cells.each do |cell|
         input = Input.new(
-          previous_output: OutPoint.new(
-            tx_hash: cell[:out_point][:tx_hash],
-            index: cell[:out_point][:index]
-          ),
+          previous_output: cell[:out_point],
           args: [],
           since: '0'
         )
