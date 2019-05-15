@@ -67,7 +67,7 @@ module Ckb
       end
 
       tx = Transaction.new(
-        version: '0',
+        version: 0,
         deps: [],
         inputs: i.inputs,
         outputs: outputs
